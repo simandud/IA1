@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaGoogle, FaFacebook } from 'react-icons/fa';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -113,6 +113,34 @@ const Login = () => {
               </button>
             </div>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <a
+                href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`}
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <FaGoogle className="h-5 w-5 text-red-500 mr-2" />
+                Google
+              </a>
+              <a
+                href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/facebook`}
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <FaFacebook className="h-5 w-5 text-blue-600 mr-2" />
+                Facebook
+              </a>
+            </div>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">

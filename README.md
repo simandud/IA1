@@ -5,21 +5,63 @@ A modern, enterprise-grade social network platform designed for workforce collab
 ## Features
 
 ### Core Functionality
-- **User Authentication**: Secure JWT-based authentication with role-based access control
+- **User Authentication & Authorization**:
+  - Secure JWT-based authentication with role-based access control
+  - OAuth integration (Google & Facebook login)
+  - Email/password authentication
+  - Session management and security
+
+- **Privacy Settings**:
+  - Customizable profile visibility (public, team, private)
+  - Message permission controls (everyone, team, nobody)
+  - Control email and phone number visibility
+
 - **News Feed**: Post updates, share ideas, and interact with colleagues
-- **Real-time Messaging**: Instant chat with Socket.io for real-time communication
-- **Task Management**: Create, assign, and track tasks with status updates
-- **Employee Profiles**: Comprehensive user profiles with performance metrics
+  - Like, comment, and share functionality
+  - Tags and mentions
+  - Rich media support (images, documents)
+
+- **Real-time Messaging**: Instant chat with Socket.io
+  - Private and group conversations
+  - Real-time message delivery
+  - Typing indicators
+  - Read receipts
+
+- **Task Management**: Complete task tracking system
+  - Create, assign, and track tasks
+  - Priority levels and status tracking
+  - Due dates and notifications
+  - Task comments and collaboration
+
+- **Employee Profiles**: Comprehensive user profiles
+  - Performance metrics and analytics
+  - Skills and social links
+  - Activity history
+
+- **File Management**:
+  - Version control for uploaded files
+  - File history and rollback
+  - Cloud storage integration (AWS S3)
+
+- **Activity Logging**: Track all user actions
+  - Login/logout tracking
+  - Content creation and modifications
+  - Task completions
+  - Detailed activity reports
+
 - **Search**: Global search across users, posts, and tasks
 - **Admin Panel**: Dashboard for managing users, content, and analytics
 
 ### Technical Features
 - **Frontend**: React 18 with Vite, TailwindCSS, React Router, React Query
 - **Backend**: Node.js with Express, MongoDB, Socket.io
-- **Security**: Helmet, CORS, rate limiting, input validation
-- **File Uploads**: AWS S3 integration for avatars and attachments
+- **Authentication**: JWT + OAuth 2.0 (Google, Facebook)
+- **Security**: Helmet, CORS, rate limiting, input validation, XSS protection
+- **File Uploads**: AWS S3 integration with versioning
 - **Caching**: Redis for improved performance
 - **Email Notifications**: Nodemailer for user notifications
+- **Testing**: Jest for unit and integration tests
+- **Activity Tracking**: Comprehensive logging system
 
 ## Tech Stack
 
@@ -41,10 +83,12 @@ A modern, enterprise-grade social network platform designed for workforce collab
 - MongoDB with Mongoose
 - Socket.io
 - JWT for authentication
+- Passport.js for OAuth
 - Bcrypt for password hashing
 - AWS SDK for S3
 - Redis for caching
 - Nodemailer for emails
+- Jest & Supertest for testing
 
 ## Getting Started
 
@@ -88,6 +132,15 @@ A modern, enterprise-grade social network platform designed for workforce collab
    # JWT
    JWT_SECRET=your-super-secret-jwt-key
    JWT_EXPIRE=7d
+
+   # Session Secret
+   SESSION_SECRET=your-session-secret
+
+   # OAuth Configuration
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   FACEBOOK_APP_ID=your-facebook-app-id
+   FACEBOOK_APP_SECRET=your-facebook-app-secret
 
    # AWS S3 (optional)
    AWS_ACCESS_KEY_ID=your-aws-access-key
@@ -147,9 +200,12 @@ A modern, enterprise-grade social network platform designed for workforce collab
 ### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
+- `GET /api/auth/google` - Google OAuth login
+- `GET /api/auth/facebook` - Facebook OAuth login
 - `GET /api/auth/me` - Get current user
 - `PUT /api/auth/updatedetails` - Update user details
 - `PUT /api/auth/updatepassword` - Update password
+- `PUT /api/auth/privacy-settings` - Update privacy settings
 - `GET /api/auth/logout` - Logout user
 
 ### Users
@@ -210,6 +266,37 @@ A modern, enterprise-grade social network platform designed for workforce collab
 ### Search
 - `GET /api/search?q={query}` - Global search
 - `GET /api/search/users?q={query}` - Search users
+
+### Activity Logs
+- `GET /api/activity` - Get user activity logs
+- `GET /api/activity/stats` - Get activity statistics (Admin/Manager)
+
+### File Management
+- `POST /api/files/upload` - Upload file with versioning
+- `GET /api/files/:fileId/versions` - Get file versions
+- `GET /api/files/:fileId/current` - Get current file version
+- `PUT /api/files/:fileId/restore/:version` - Restore file version
+- `DELETE /api/files/:fileId` - Delete file and all versions
+
+## Testing
+
+### Run Backend Tests
+```bash
+cd backend
+npm test
+```
+
+### Run Tests with Coverage
+```bash
+cd backend
+npm test -- --coverage
+```
+
+### Run Tests in Watch Mode
+```bash
+cd backend
+npm run test:watch
+```
 
 ## Deployment
 

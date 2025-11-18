@@ -21,9 +21,22 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: function() {
+      // Password not required for OAuth users
+      return !this.googleId && !this.facebookId;
+    },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  facebookId: {
+    type: String,
+    unique: true,
+    sparse: true
   },
   role: {
     type: String,
@@ -87,6 +100,26 @@ const userSchema = new mongoose.Schema({
     interactionScore: {
       type: Number,
       default: 0
+    }
+  },
+  privacySettings: {
+    profileVisibility: {
+      type: String,
+      enum: ['public', 'team', 'private'],
+      default: 'team'
+    },
+    allowMessagesFrom: {
+      type: String,
+      enum: ['everyone', 'team', 'nobody'],
+      default: 'everyone'
+    },
+    showEmail: {
+      type: Boolean,
+      default: false
+    },
+    showPhone: {
+      type: Boolean,
+      default: false
     }
   }
 }, {

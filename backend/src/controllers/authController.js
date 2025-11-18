@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { sendTokenResponse } = require('../utils/jwt');
+const { sendTokenResponse, generateToken } = require('../utils/jwt');
 const { sendWelcomeEmail } = require('../utils/email');
 
 // @desc    Register user
@@ -77,6 +77,38 @@ exports.login = async (req, res, next) => {
     sendTokenResponse(user, 200, res);
   } catch (error) {
     next(error);
+  }
+};
+
+// @desc    Google OAuth callback
+// @route   GET /api/auth/google/callback
+// @access  Public
+exports.googleCallback = async (req, res) => {
+  try {
+    // User is attached to req by passport
+    const token = generateToken(req.user._id);
+
+    // Redirect to frontend with token
+    const redirectUrl = `${process.env.CLIENT_URL}/auth/callback?token=${token}`;
+    res.redirect(redirectUrl);
+  } catch (error) {
+    res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+  }
+};
+
+// @desc    Facebook OAuth callback
+// @route   GET /api/auth/facebook/callback
+// @access  Public
+exports.facebookCallback = async (req, res) => {
+  try {
+    // User is attached to req by passport
+    const token = generateToken(req.user._id);
+
+    // Redirect to frontend with token
+    const redirectUrl = `${process.env.CLIENT_URL}/auth/callback?token=${token}`;
+    res.redirect(redirectUrl);
+  } catch (error) {
+    res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
   }
 };
 
@@ -158,6 +190,14 @@ exports.updatePassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('+password');
 
+    // Check if user has password (not OAuth user)
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'This account uses OAuth authentication'
+      });
+    }
+
     // Check current password
     if (!(await user.comparePassword(req.body.currentPassword))) {
       return res.status(401).json({
@@ -170,6 +210,35 @@ exports.updatePassword = async (req, res, next) => {
     await user.save();
 
     sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update privacy settings
+// @route   PUT /api/auth/privacy-settings
+// @access  Private
+exports.updatePrivacySettings = async (req, res, next) => {
+  try {
+    const { profileVisibility, allowMessagesFrom, showEmail, showPhone } = req.body;
+
+    const privacySettings = {};
+
+    if (profileVisibility) privacySettings.profileVisibility = profileVisibility;
+    if (allowMessagesFrom) privacySettings.allowMessagesFrom = allowMessagesFrom;
+    if (showEmail !== undefined) privacySettings.showEmail = showEmail;
+    if (showPhone !== undefined) privacySettings.showPhone = showPhone;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { privacySettings },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: user.privacySettings
+    });
   } catch (error) {
     next(error);
   }

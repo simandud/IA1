@@ -7,6 +7,8 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
 const { Server } = require('socket.io');
+const session = require('express-session');
+const passport = require('./config/passport');
 
 // Import database connections
 const connectDB = require('./config/database');
@@ -22,6 +24,8 @@ const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const adminRoutes = require('./routes/admin');
 const searchRoutes = require('./routes/search');
+const activityRoutes = require('./routes/activity');
+const fileRoutes = require('./routes/files');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -86,6 +90,21 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
+// Session middleware for OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -106,6 +125,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/files', fileRoutes);
 
 // 404 handler
 app.use((req, res) => {

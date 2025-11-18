@@ -6,6 +6,7 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 // Lazy load pages
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
+const OAuthCallback = lazy(() => import('./pages/auth/OAuthCallback'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const NewsFeed = lazy(() => import('./pages/NewsFeed'));
 const Messages = lazy(() => import('./pages/Messages'));
@@ -69,6 +70,7 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
 
         {/* Protected Routes */}
         <Route
