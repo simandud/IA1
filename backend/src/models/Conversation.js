@@ -1,0 +1,37 @@
+const mongoose = require('mongoose');
+
+const conversationSchema = new mongoose.Schema({
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  type: {
+    type: String,
+    enum: ['private', 'group'],
+    default: 'private'
+  },
+  name: {
+    type: String,
+    trim: true
+  },
+  avatar: {
+    type: String
+  },
+  lastMessage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message'
+  },
+  unreadCount: {
+    type: Map,
+    of: Number,
+    default: {}
+  }
+}, {
+  timestamps: true
+});
+
+// Index for faster queries
+conversationSchema.index({ participants: 1 });
+conversationSchema.index({ updatedAt: -1 });
+
+module.exports = mongoose.model('Conversation', conversationSchema);
